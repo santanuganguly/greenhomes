@@ -7,6 +7,7 @@ import {
   BRAND_SUBTITLE,
   BRAND_TAGLINE,
   CONTACT_INFO,
+  withBasePath,
 } from "@/data/siteContent";
 import { HoverRevealText } from "./HoverRevealText";
 import { useContact } from "./ContactContext";
@@ -23,7 +24,7 @@ export function FooterSection() {
         <div className="flex flex-wrap items-center justify-between gap-6 text-xs uppercase tracking-[0.12em] md:text-sm">
           <Link href="/" className="inline-block">
             <img
-              src="/images/green-homes-logo.png"
+              src={withBasePath("/images/green-homes-logo.png")}
               alt="Green Homes by Green Hill Group"
               className="h-11 w-auto object-contain md:h-12"
             />

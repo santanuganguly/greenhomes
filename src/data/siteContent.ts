@@ -84,14 +84,20 @@ export type PhotoVariant =
   | "service-commercial"
   | "service-consultation";
 
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
+export function withBasePath(path: string): string {
+  return `${BASE_PATH}${path}`;
+}
+
 export const PHOTO_SOURCES: Record<PhotoVariant, string> = {
-  "hero-villa": "/images/hero-villa.jpg",
-  "about-home-daytime": "/images/about-home-daytime.jpg",
-  "about-home-evening": "/images/about-home-evening.jpg",
-  "service-home-construction": "/images/service-home-construction.jpg",
-  "service-renovation": "/images/service-renovation.jpg",
-  "service-commercial": "/images/service-commercial.jpg",
-  "service-consultation": "/images/service-consultation.jpg",
+  "hero-villa": withBasePath("/images/hero-villa.jpg"),
+  "about-home-daytime": withBasePath("/images/about-home-daytime.jpg"),
+  "about-home-evening": withBasePath("/images/about-home-evening.jpg"),
+  "service-home-construction": withBasePath("/images/service-home-construction.jpg"),
+  "service-renovation": withBasePath("/images/service-renovation.jpg"),
+  "service-commercial": withBasePath("/images/service-commercial.jpg"),
+  "service-consultation": withBasePath("/images/service-consultation.jpg"),
 };
 
 export const ABOUT_SLIDES: { variant: PhotoVariant; alt: string; caption: string }[] = [

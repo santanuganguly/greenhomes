@@ -4,6 +4,7 @@ import "./globals.css";
 import { ContactProvider } from "@/components/ContactContext";
 import { SiteHeader } from "@/components/SiteHeader";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { withBasePath } from "@/data/siteContent";
 
 const familjenGrotesk = Familjen_Grotesk({
   subsets: ["latin"],
@@ -26,10 +27,10 @@ export const metadata: Metadata = {
     "Green Homes by Green Hill Group: design-to-build turnkey home construction, renovation, and commercial builds in Siliguri and North Bengal. Fixed per-sqft pricing, 470+ quality checks, and 5-year warranty.",
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.png", type: "image/png", sizes: "192x192" },
+      { url: withBasePath("/favicon.ico"), sizes: "any" },
+      { url: withBasePath("/icon.png"), type: "image/png", sizes: "192x192" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+    apple: [{ url: withBasePath("/apple-touch-icon.png"), sizes: "180x180" }],
   },
 };
 
