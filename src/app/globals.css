@@ -1,0 +1,253 @@
+@import "tailwindcss";
+
+:root {
+  --bg-stone: #ede6d6;
+  --ink-espresso: #2a2725;
+  --ink-muted: #292625b3;
+  --surface-white: #ffffff;
+  --surface-black: #000000;
+  --blueprint-blue: #1c398e;
+  --status-green: #3fa85b;
+  --gh-green-900: #0f3a2e;
+  --gh-green-800: #155341;
+  --gh-green-700: #1c6b54;
+  --gh-gold: #c9a86a;
+  --target-size: 24px;
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --target-size: 44px;
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-familjen-grotesk), "Familjen Grotesk Fallback", sans-serif;
+  --font-serif: var(--font-instrument-serif), "Instrument Serif Fallback", serif;
+  --color-stone-bg: var(--bg-stone);
+  --color-espresso: var(--ink-espresso);
+  --color-blueprint: var(--blueprint-blue);
+  --color-available: var(--status-green);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(5rem + env(safe-area-inset-top, 0px));
+  scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  background-color: var(--bg-stone);
+  color: var(--ink-espresso);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  overflow-wrap: break-word;
+  margin: 0;
+}
+
+:where(a, code) {
+  overflow-wrap: anywhere;
+}
+
+:where(h1, h2, h3) {
+  text-wrap: balance;
+}
+
+:where(p, li) {
+  text-wrap: pretty;
+}
+
+/* Minimum touch target size on coarse-pointer (mobile/tablet) devices */
+:where(
+    button:not(.dot-rail-btn),
+    select,
+    textarea,
+    input:not([type="checkbox"], [type="radio"], [type="range"]),
+    [role="button"]
+  ) {
+  min-block-size: var(--target-size);
+}
+
+.dot-rail-btn {
+  position: relative;
+}
+
+.dot-rail-btn::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+}
+
+.visually-hidden:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+.char-mask {
+  position: relative;
+  display: inline-block;
+  overflow: clip;
+  padding-bottom: 0.18em;
+  margin-bottom: -0.18em;
+}
+
+.char-inner {
+  position: relative;
+  display: inline-block;
+}
+
+/* Hover character reveal effect matching the original navigation & links */
+.hover-reveal-track {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.hover-reveal-line {
+  display: block;
+  white-space: nowrap;
+}
+
+.hover-reveal-line:last-child {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+}
+
+.hover-reveal-char {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hover-reveal-char {
+    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+.hover-reveal-line:last-child .hover-reveal-char {
+  transform: translateY(110%);
+}
+
+@media (hover: hover) {
+  .group:hover .hover-reveal-line:first-child .hover-reveal-char,
+  [data-hover-reveal="true"]:hover .hover-reveal-line:first-child .hover-reveal-char,
+  [data-hover-reveal="true"]:focus-visible .hover-reveal-line:first-child .hover-reveal-char {
+    transform: translateY(-110%);
+  }
+
+  .group:hover .hover-reveal-line:last-child .hover-reveal-char,
+  [data-hover-reveal="true"]:hover .hover-reveal-line:last-child .hover-reveal-char,
+  [data-hover-reveal="true"]:focus-visible .hover-reveal-line:last-child .hover-reveal-char {
+    transform: translateY(0%);
+  }
+}
+
+/* Marquee subtle ambient drift — opt in under no-preference */
+@keyframes marquee-drift {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-33.3333%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-ambient {
+    animation: marquee-drift 28s linear infinite;
+  }
+  .marquee-ambient[data-paused="true"] {
+    animation-play-state: paused;
+  }
+}
+
+/* Post-interaction accessible field validation (:user-invalid / :user-valid) */
+:is(input, select, textarea).gh-input:is(:user-invalid, .user-invalid-fallback) {
+  border-color: #b42318;
+  background-color: #fef3f2;
+}
+
+:is(input, select, textarea).gh-input:is(:user-valid, .user-valid-fallback) {
+  border-color: #155341;
+}
+
+.gh-error-msg {
+  display: none;
+  color: #b42318;
+  font-size: 0.78rem;
+  margin-top: 0.25rem;
+}
+
+:is(input, select, textarea).gh-input:is(:user-invalid, .user-invalid-fallback) + .gh-error-msg {
+  display: block;
+}
+
+/* Dialog backdrop and entry/exit transitions */
+dialog.contact-dialog {
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  transition:
+    opacity 0.25s ease-out,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    display 0.25s allow-discrete,
+    overlay 0.25s allow-discrete;
+}
+
+dialog.contact-dialog[open] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@starting-style {
+  dialog.contact-dialog[open] {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+dialog.contact-dialog::backdrop {
+  background-color: rgba(10, 10, 10, 0);
+  backdrop-filter: blur(0px);
+  transition:
+    background-color 0.25s ease-out,
+    backdrop-filter 0.25s ease-out,
+    display 0.25s allow-discrete,
+    overlay 0.25s allow-discrete;
+}
+
+dialog.contact-dialog[open]::backdrop {
+  background-color: rgba(10, 10, 10, 0.58);
+  backdrop-filter: blur(6px);
+}
+
+@starting-style {
+  dialog.contact-dialog[open]::backdrop {
+    background-color: rgba(10, 10, 10, 0);
+    backdrop-filter: blur(0px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ping {
+    animation: none;
+  }
+  dialog.contact-dialog,
+  dialog.contact-dialog::backdrop {
+    transition: none;
+  }
+}
