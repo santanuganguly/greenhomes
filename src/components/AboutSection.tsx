@@ -53,28 +53,52 @@ export function AboutSection() {
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
+    let stableVh = window.innerHeight || 900;
+    let rafId = 0;
+    let lastP = -1;
 
-    const update = () => {
-      const el = sectionRef.current;
-      if (!el) return;
-      setStageWidth(el.clientWidth);
-      if (mq.matches) {
-        setProgress(0.8);
-        return;
-      }
-      const vh = window.innerHeight || 900;
-      const rect = el.getBoundingClientRect();
-      const maxScroll = Math.max(1, el.offsetHeight - vh);
-      const p = Math.min(1, Math.max(0, -rect.top / maxScroll));
-      setProgress(p);
+    const updateLayout = () => {
+      stableVh = window.innerHeight || 900;
+      if (sectionRef.current) setStageWidth(sectionRef.current.clientWidth);
     };
 
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    const measureScroll = () => {
+      rafId = 0;
+      const el = sectionRef.current;
+      if (!el) return;
+      if (mq.matches) {
+        if (lastP !== 0.8) {
+          lastP = 0.8;
+          setProgress(0.8);
+        }
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      const maxScroll = Math.max(1, el.offsetHeight - stableVh);
+      const p = Math.min(1, Math.max(0, -rect.top / maxScroll));
+      if (Math.abs(p - lastP) > 0.0015 || p === 0 || p === 1) {
+        lastP = p;
+        setProgress(p);
+      }
+    };
+
+    const onScroll = () => {
+      if (!rafId) rafId = window.requestAnimationFrame(measureScroll);
+    };
+
+    const onResize = () => {
+      updateLayout();
+      measureScroll();
+    };
+
+    updateLayout();
+    measureScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      if (rafId) window.cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 

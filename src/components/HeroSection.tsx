@@ -14,17 +14,37 @@ export function HeroSection() {
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
+    let stableVh = window.innerHeight || 900;
+    let rafId = 0;
+    let lastP = -1;
 
-    const onScroll = () => {
+    const measureScroll = () => {
+      rafId = 0;
       if (mq.matches) return;
-      const vh = window.innerHeight || 900;
-      const p = Math.min(1, Math.max(0, window.scrollY / vh));
-      setScrollProgress(p);
+      const p = Math.min(1, Math.max(0, window.scrollY / stableVh));
+      if (Math.abs(p - lastP) > 0.0015 || p === 0 || p === 1) {
+        lastP = p;
+        setScrollProgress(p);
+      }
     };
 
-    onScroll();
+    const onScroll = () => {
+      if (!rafId) rafId = window.requestAnimationFrame(measureScroll);
+    };
+
+    const onResize = () => {
+      stableVh = window.innerHeight || 900;
+      measureScroll();
+    };
+
+    measureScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onResize);
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   const scale = reducedMotion ? 1 : 1 + scrollProgress * 0.12;
@@ -34,8 +54,8 @@ export function HeroSection() {
   return (
     <section className="sticky top-0 z-0 min-h-[100dvh] w-full overflow-hidden bg-black text-white lg:h-screen lg:min-h-screen select-none">
       <div
-        className="hero-image-wrap pointer-events-none absolute inset-0"
-        style={{ transform: `scale(${scale})` }}
+        className="hero-image-wrap pointer-events-none absolute inset-0 will-change-transform"
+        style={{ transform: `scale(${scale}) translateZ(0)` }}
       >
         <ArchitecturalArt
           variant="hero-villa"
@@ -48,14 +68,14 @@ export function HeroSection() {
 
       {/* Responsive flex layout on mobile/tablet so title, CTAs & metadata never overlap on short viewports */}
       <div
-        className="hero-content pointer-events-auto relative z-10 flex min-h-[100dvh] flex-col justify-between px-5 pb-6 pt-24 sm:px-6 md:px-10 md:pt-28 lg:absolute lg:inset-0 lg:block lg:p-0"
+        className="hero-content pointer-events-auto relative z-10 flex min-h-[100dvh] flex-col justify-between px-5 pb-6 pt-28 sm:px-6 md:px-10 md:pt-32 lg:absolute lg:inset-0 lg:block lg:p-0"
         style={{
           opacity: contentOpacity,
           transform: `translate3d(0px, ${contentTranslateY}px, 0px)`,
         }}
       >
-        <div className="lg:absolute lg:left-10 lg:top-[13%] [@media(orientation:landscape)_and_(max-height:500px)_and_(max-width:1023px)]:pt-2">
-          <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a86a] sm:text-xs">
+        <div className="lg:absolute lg:left-10 lg:top-[23%] [@media(orientation:landscape)_and_(max-height:500px)_and_(max-width:1023px)]:pt-2">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a86a] sm:text-xs">
             Siliguri · North Bengal · Turnkey Construction
           </p>
           <h1 className="hero-title-line font-serif text-[clamp(2.5rem,1rem+7vw,4.5rem)] leading-[0.94] text-white md:text-[5rem] lg:text-[5.5rem] [@media(orientation:landscape)_and_(max-height:500px)_and_(max-width:1023px)]:text-[2.25rem]">
@@ -66,11 +86,11 @@ export function HeroSection() {
               <CharReveal text="Builders." />
             </span>
           </h1>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/90 sm:mt-4 md:text-base">
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/90 sm:mt-5 md:text-base">
             We handle everything from building plans and government approvals to final handover — with fixed pricing, regular quality checks, and no hidden costs.
           </p>
 
-          <div className="hero-actions mt-5 flex flex-col items-start gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 [@media(orientation:landscape)_and_(max-height:500px)_and_(max-width:1023px)]:mt-3 [@media(orientation:landscape)_and_(max-height:500px)_and_(max-width:1023px)]:flex-row">
+          <div className="hero-actions mt-6 flex flex-col items-start gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 [@media(orientation:landscape)_and_(max-height:500px)_and_(max-width:1023px)]:mt-3 [@media(orientation:landscape)_and_(max-height:500px)_and_(max-width:1023px)]:flex-row">
             <button
               type="button"
               onClick={() => openContact({ service: "home" })}

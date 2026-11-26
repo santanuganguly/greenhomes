@@ -16,37 +16,61 @@ export function Residence02Sections() {
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let stableVh = window.innerHeight || 900;
+    let rafId = 0;
+    let lastP = -1;
 
-    const onScroll = () => {
+    const updateLayout = () => {
+      stableVh = window.innerHeight || 900;
       setIsLg(window.innerWidth >= 1024);
       if (res2Ref.current) setRes2Width(res2Ref.current.clientWidth);
+    };
+
+    const measureScroll = () => {
+      rafId = 0;
       if (mq.matches) {
-        setRes2Progress(0.35);
+        if (lastP !== 0.35) {
+          lastP = 0.35;
+          setRes2Progress(0.35);
+        }
         return;
       }
-
-      if (res2Ref.current) {
-        const rect = res2Ref.current.getBoundingClientRect();
-        const max = Math.max(1, res2Ref.current.offsetHeight - window.innerHeight);
-        setRes2Progress(Math.min(1, Math.max(0, -rect.top / max)));
+      if (!res2Ref.current) return;
+      const rect = res2Ref.current.getBoundingClientRect();
+      const max = Math.max(1, res2Ref.current.offsetHeight - stableVh);
+      const nextP = Math.min(1, Math.max(0, -rect.top / max));
+      if (Math.abs(nextP - lastP) > 0.0015 || nextP === 0 || nextP === 1) {
+        lastP = nextP;
+        setRes2Progress(nextP);
       }
     };
 
-    onScroll();
+    const onScroll = () => {
+      if (!rafId) rafId = window.requestAnimationFrame(measureScroll);
+    };
+
+    const onResize = () => {
+      updateLayout();
+      measureScroll();
+    };
+
+    updateLayout();
+    measureScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
     return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
-  const expandT = Math.min(1, res2Progress / 0.22);
+  const expandT = Math.min(1, res2Progress / 0.2);
   const serviceIndex = Math.min(
     2,
-    Math.max(0, Math.floor(((res2Progress - 0.24) / 0.76) * 3))
+    Math.max(0, Math.floor(((res2Progress - 0.22) / 0.78) * 3))
   );
-  const showSplit = res2Progress >= 0.22;
+  const showSplit = res2Progress >= 0.2;
 
   return (
     <>
@@ -74,7 +98,7 @@ export function Residence02Sections() {
       <section
         id="services"
         ref={res2Ref}
-        className="relative z-30 h-[3400px] w-full bg-[#EDE6D6] text-[#2A2725] lg:h-[5200px]"
+        className="relative z-30 h-[2500px] w-full bg-[#EDE6D6] text-[#2A2725] lg:h-[4600px]"
       >
         <div className="relative h-full w-full">
           <div
@@ -82,51 +106,53 @@ export function Residence02Sections() {
             style={{ maxWidth: res2Width ? `${res2Width}px` : "100%" }}
           >
             <div className="relative h-full w-full">
-              {TURNKEY_SERVICES.map((svc, idx) => {
-                const isMain = !showSplit ? idx === 0 : idx === serviceIndex;
-                return (
-                  <div
-                    key={svc.id}
-                    className="ap-img absolute overflow-hidden transition-all duration-500 ease-out"
-                    style={
-                      isMain
-                        ? {
-                            zIndex: 3,
-                            opacity: 1,
-                            top: 0,
-                            left: 0,
-                            width: showSplit && isLg ? "66%" : "100%",
-                            height: showSplit && !isLg ? "46%" : "100%",
-                            borderRadius: "0px",
-                            clipPath: showSplit
-                              ? "inset(0% 0% 0% 0% round 0px)"
-                              : `inset(${(1 - expandT) * (isLg ? 28 : 8)}% ${(1 - expandT) * (isLg ? 8 : 5)}% round ${(1 - expandT) * 24}px)`,
-                          }
-                        : {
-                            zIndex: 2 - idx,
-                            opacity: showSplit ? 0 : 0.01,
-                            top: "84%",
-                            left: "74%",
-                            width: "22%",
-                            height: "12%",
-                            borderRadius: "18px",
-                          }
-                    }
-                  >
-                    <ArchitecturalArt
-                      variant={svc.variant}
-                      alt={svc.alt}
-                      className="ap-img-inner h-full w-full object-cover"
-                      lazy
-                    />
-                  </div>
-                );
-              })}
+              {/* GPU-composited media frame: scales smoothly on entry, glides smoothly into split framing */}
+              <div
+                className={`ap-img-frame absolute left-0 top-0 h-full overflow-hidden will-change-transform ${
+                  showSplit
+                    ? "transition-[transform,width,border-radius] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                    : ""
+                }`}
+                style={{
+                  width: showSplit && isLg ? "66%" : "100%",
+                  borderRadius: showSplit ? "0px" : `${Math.round((1 - expandT) * 24)}px`,
+                  transform: showSplit
+                    ? isLg
+                      ? "translate3d(0, 0, 0) scale(1)"
+                      : "translate3d(0, -14%, 0) scale(1)"
+                    : `translate3d(0, ${(1 - expandT) * 4}%, 0) scale(${(isLg ? 0.88 : 0.92) + expandT * (isLg ? 0.12 : 0.08)})`,
+                }}
+              >
+                {TURNKEY_SERVICES.map((svc, idx) => {
+                  const isMain = !showSplit ? idx === 0 : idx === serviceIndex;
+                  return (
+                    <div
+                      key={svc.id}
+                      className="ap-img absolute inset-0 overflow-hidden will-change-[opacity,transform] transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                      style={{
+                        zIndex: isMain ? 2 : 1,
+                        opacity: isMain ? 1 : 0,
+                        transform: isMain ? "scale(1) translateZ(0)" : "scale(1.03) translateZ(0)",
+                      }}
+                    >
+                      <ArchitecturalArt
+                        variant={svc.variant}
+                        alt={svc.alt}
+                        className="ap-img-inner h-full w-full object-cover"
+                        lazy={idx !== 0}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
 
               {/* Opening Services hero overlay */}
               <div
-                className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col gap-3 bg-gradient-to-t from-black/70 via-black/25 to-transparent p-6 text-white transition-opacity duration-300 md:p-8 lg:gap-4 lg:p-12"
-                style={{ opacity: showSplit ? 0 : 1 }}
+                className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col gap-3 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-6 text-white will-change-[opacity,transform] transition-[opacity,transform] duration-300 ease-out md:p-8 lg:gap-4 lg:p-12"
+                style={{
+                  opacity: showSplit ? 0 : 1,
+                  transform: showSplit ? "translate3d(0, 12px, 0)" : "translate3d(0, 0, 0)",
+                }}
               >
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9a86a]">
                   Turnkey Services
@@ -141,32 +167,23 @@ export function Residence02Sections() {
                 </h2>
               </div>
 
-              {/* Service narrative panel: docked cleanly to bottom half on mobile, right column on desktop */}
-              <div className="pointer-events-none absolute inset-x-3 bottom-3 top-[47%] z-20 lg:inset-y-[12%] lg:left-[68%] lg:right-[3%]">
+              {/* Service narrative panel: GPU-composited card transition for smooth mobile scroll */}
+              <div className="pointer-events-none absolute inset-x-3 bottom-3 top-[46%] z-20 lg:inset-y-[12%] lg:left-[68%] lg:right-[3%]">
                 {TURNKEY_SERVICES.map((svc, idx) => {
                   const isActive = showSplit && idx === serviceIndex;
                   return (
                     <div
                       key={svc.id}
-                      className={`ap-text absolute inset-0 flex flex-col justify-between gap-2 overflow-y-auto p-4 transition-all duration-500 sm:p-5 lg:justify-center lg:gap-4 lg:overflow-visible lg:p-0 ${
-                        isActive
-                          ? "rounded-2xl border border-[#0f3a2e]/10 bg-white/96 shadow-xl backdrop-blur-sm lg:border-0 lg:bg-transparent lg:shadow-none lg:backdrop-blur-none"
-                          : ""
-                      }`}
+                      className="ap-text absolute inset-0 flex flex-col justify-between gap-2 overflow-y-auto rounded-2xl border border-[#0f3a2e]/12 bg-white p-4 shadow-lg will-change-[opacity,transform] transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:p-5 lg:justify-center lg:gap-4 lg:overflow-visible lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
                       style={{
                         opacity: isActive ? 1 : 0,
+                        transform: isActive ? "translate3d(0, 0, 0)" : "translate3d(0, 22px, 0)",
                         pointerEvents: isActive ? "auto" : "none",
                       }}
                     >
                       <div>
                         <div className="flex items-center justify-between gap-2">
-                          <p
-                            className="ap-piece text-[10px] font-semibold uppercase tracking-[0.18em] text-[#155341] transition-all duration-500"
-                            style={{
-                              opacity: isActive ? 1 : 0,
-                              transform: isActive ? "translate3d(0, 0%, 0)" : "translate3d(0, 110%, 0)",
-                            }}
-                          >
+                          <p className="ap-piece text-[10px] font-semibold uppercase tracking-[0.18em] text-[#155341]">
                             {svc.eyebrow}
                           </p>
                           <span className="text-[10px] font-semibold tabular-nums text-[#0f3a2e]/60 lg:hidden">
@@ -175,51 +192,20 @@ export function Residence02Sections() {
                         </div>
                         <h3 className="mt-1 font-sans text-[clamp(1.4rem,1rem+1.8vw,2.6rem)] leading-[0.98] tracking-[-0.04em] text-[#0f3a2e]">
                           {svc.lines.map((line, i) => (
-                            <span
-                              key={i}
-                              className="-mb-[0.18em] -mt-[0.05em] block overflow-hidden pb-[0.18em] pt-[0.05em]"
-                            >
-                              <span
-                                className="ap-piece block transition-all duration-500"
-                                style={{
-                                  opacity: isActive ? 1 : 0,
-                                  transform: isActive
-                                    ? "translate3d(0, 0%, 0)"
-                                    : "translate3d(0, 110%, 0)",
-                                }}
-                              >
-                                {line}
-                              </span>
+                            <span key={i} className="block">
+                              {line}
                             </span>
                           ))}
                         </h3>
-                        <p
-                          className="ap-piece mt-2 max-w-[26rem] text-xs leading-[1.45] tracking-[-0.01em] text-[#2A2725]/85 transition-all duration-500 md:text-sm"
-                          style={{
-                            opacity: isActive ? 1 : 0,
-                            transform: isActive ? "translate3d(0, 0%, 0)" : "translate3d(0, 110%, 0)",
-                          }}
-                        >
+                        <p className="ap-piece mt-2 max-w-[26rem] text-xs leading-[1.45] tracking-[-0.01em] text-[#2A2725]/85 md:text-sm">
                           {svc.copy}
                         </p>
-                        <p
-                          className="ap-piece mt-1.5 text-[10px] uppercase leading-[1.45] tracking-[0.12em] text-[#155341] transition-all duration-500"
-                          style={{
-                            opacity: isActive ? 0.85 : 0,
-                            transform: isActive ? "translate3d(0, 0%, 0)" : "translate3d(0, 110%, 0)",
-                          }}
-                        >
+                        <p className="ap-piece mt-1.5 text-[10px] uppercase leading-[1.45] tracking-[0.12em] text-[#155341]/85">
                           {svc.tags}
                         </p>
                       </div>
 
-                      <div
-                        className="pt-1 transition-all duration-500"
-                        style={{
-                          opacity: isActive ? 1 : 0,
-                          transform: isActive ? "translate3d(0, 0%, 0)" : "translate3d(0, 110%, 0)",
-                        }}
-                      >
+                      <div className="pt-1">
                         <button
                           type="button"
                           onClick={() => openContact({ service: svc.id })}

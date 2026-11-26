@@ -13,28 +13,53 @@ export function ResidenceSlidesSection() {
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
+    let stableVh = window.innerHeight || 900;
+    let rafId = 0;
+    let lastP = -1;
 
-    const onScroll = () => {
+    const updateLayout = () => {
+      stableVh = window.innerHeight || 900;
       setIsLg(window.innerWidth >= 1024);
+      if (sectionRef.current) setStageWidth(sectionRef.current.clientWidth);
+    };
+
+    const measureScroll = () => {
+      rafId = 0;
       const el = sectionRef.current;
       if (!el) return;
-      setStageWidth(el.clientWidth);
       if (mq.matches) {
-        setProgress(0);
+        if (lastP !== 0) {
+          lastP = 0;
+          setProgress(0);
+        }
         return;
       }
       const rect = el.getBoundingClientRect();
-      const maxScroll = Math.max(1, el.offsetHeight - window.innerHeight);
+      const maxScroll = Math.max(1, el.offsetHeight - stableVh);
       const p = Math.min(1, Math.max(0, -rect.top / maxScroll));
-      setProgress(p);
+      if (Math.abs(p - lastP) > 0.0015 || p === 0 || p === 1) {
+        lastP = p;
+        setProgress(p);
+      }
     };
 
-    onScroll();
+    const onScroll = () => {
+      if (!rafId) rafId = window.requestAnimationFrame(measureScroll);
+    };
+
+    const onResize = () => {
+      updateLayout();
+      measureScroll();
+    };
+
+    updateLayout();
+    measureScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
     return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
@@ -100,7 +125,7 @@ export function ResidenceSlidesSection() {
                 }}
               >
                 <div
-                  className="rs-text pointer-events-auto relative flex flex-col justify-between overflow-hidden rounded-[24px] bg-white p-5 text-[#2A2725] shadow-sm md:rounded-[36px] md:p-8 lg:col-start-2 lg:p-10"
+                  className="rs-text pointer-events-auto relative flex flex-col justify-between overflow-hidden rounded-[24px] bg-white p-5 text-[#2A2725] shadow-sm will-change-transform md:rounded-[36px] md:p-8 lg:col-start-2 lg:p-10"
                   style={{
                     transform: `translate3d(0, ${(1 - slide2T) * 105}%, 0)`,
                   }}

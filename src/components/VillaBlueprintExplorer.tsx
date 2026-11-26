@@ -83,23 +83,45 @@ export function VillaBlueprintExplorer() {
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
+    let stableVh = window.innerHeight || 900;
+    let rafId = 0;
+    let lastP = -1;
 
-    const onScroll = () => {
-      const el = sectionRef.current;
-      if (!el) return;
-      setStageWidth(el.clientWidth);
-      const rect = el.getBoundingClientRect();
-      const maxScroll = Math.max(1, el.offsetHeight - window.innerHeight);
-      const p = Math.min(1, Math.max(0, -rect.top / maxScroll));
-      setScrollProgress(p);
+    const updateLayout = () => {
+      stableVh = window.innerHeight || 900;
+      if (sectionRef.current) setStageWidth(sectionRef.current.clientWidth);
     };
 
-    onScroll();
+    const measureScroll = () => {
+      rafId = 0;
+      const el = sectionRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const maxScroll = Math.max(1, el.offsetHeight - stableVh);
+      const p = Math.min(1, Math.max(0, -rect.top / maxScroll));
+      if (Math.abs(p - lastP) > 0.0015 || p === 0 || p === 1) {
+        lastP = p;
+        setScrollProgress(p);
+      }
+    };
+
+    const onScroll = () => {
+      if (!rafId) rafId = window.requestAnimationFrame(measureScroll);
+    };
+
+    const onResize = () => {
+      updateLayout();
+      measureScroll();
+    };
+
+    updateLayout();
+    measureScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
     return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
