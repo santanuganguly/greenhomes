@@ -40,6 +40,11 @@ html {
   color: var(--ink-espresso);
 }
 
+.deferred-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 700px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -240,6 +245,11 @@ dialog.contact-dialog[open]::backdrop {
     background-color: rgba(10, 10, 10, 0);
     backdrop-filter: blur(0px);
   }
+}
+
+.deferred-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 700px;
 }
 
 @media (prefers-reduced-motion: reduce) {

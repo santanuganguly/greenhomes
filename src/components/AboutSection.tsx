@@ -46,20 +46,21 @@ const STATEMENT_WORDS = [
 export function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [progress, setProgress] = useState(0);
-  const [stageWidth, setStageWidth] = useState<number | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
-    let stableVh = window.innerHeight || 900;
+    let maxScroll = 1;
     let rafId = 0;
     let lastP = -1;
 
     const updateLayout = () => {
-      stableVh = window.innerHeight || 900;
-      if (sectionRef.current) setStageWidth(sectionRef.current.clientWidth);
+      const vh = window.innerHeight || 900;
+      if (sectionRef.current) {
+        maxScroll = Math.max(1, sectionRef.current.offsetHeight - vh);
+      }
     };
 
     const measureScroll = () => {
@@ -74,7 +75,6 @@ export function AboutSection() {
         return;
       }
       const rect = el.getBoundingClientRect();
-      const maxScroll = Math.max(1, el.offsetHeight - stableVh);
       const p = Math.min(1, Math.max(0, -rect.top / maxScroll));
       if (Math.abs(p - lastP) > 0.0015 || p === 0 || p === 1) {
         lastP = p;
@@ -112,10 +112,7 @@ export function AboutSection() {
       className="relative z-20 h-[1520px] overflow-x-clip bg-[#EDE6D6] text-[#2A2725] lg:h-[3780px]"
     >
       <div className="relative h-full w-full">
-        <div
-          className="about-stage sticky top-0 z-40 h-[100dvh] w-full overflow-hidden lg:h-screen"
-          style={{ maxWidth: stageWidth ? `${stageWidth}px` : "100%" }}
-        >
+        <div className="about-stage sticky top-0 z-40 h-[100dvh] w-full overflow-hidden lg:h-screen">
           {/* Phase 1: Scattered gallery (desktop + balanced centered collage on mobile) */}
           <div
             className="about-gallery pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-6 px-5 pb-12 pt-20 lg:block lg:p-0"
@@ -152,6 +149,7 @@ export function AboutSection() {
                       variant={slide.variant}
                       alt=""
                       className="h-full w-full object-cover"
+                      sizes="(max-width: 1023px) 33vw, 25vw"
                       lazy
                     />
                   </div>
@@ -178,6 +176,7 @@ export function AboutSection() {
                     variant={slide.variant}
                     alt=""
                     className="h-full w-full object-cover"
+                    sizes="25vw"
                     lazy
                   />
                 </div>

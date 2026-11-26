@@ -36,7 +36,7 @@ export function ConsultationSection() {
   return (
     <section
       id="consultation"
-      className="relative z-30 bg-[#0f3a2e] px-5 py-16 text-white sm:px-6 md:px-10 md:py-28"
+      className="deferred-section relative z-30 bg-[#0f3a2e] px-5 py-16 text-white sm:px-6 md:px-10 md:py-28"
     >
       <div className="mx-auto grid max-w-[1280px] gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
         <div className="lg:col-span-6">

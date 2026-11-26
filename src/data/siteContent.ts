@@ -90,14 +90,74 @@ export function withBasePath(path: string): string {
   return `${BASE_PATH}${path}`;
 }
 
+export interface PhotoMeta {
+  src: string;
+  webp: string;
+  webp640: string;
+  width: number;
+  height: number;
+}
+
+export const PHOTO_META: Record<PhotoVariant, PhotoMeta> = {
+  "hero-villa": {
+    src: withBasePath("/images/hero-villa.jpg"),
+    webp: withBasePath("/images/hero-villa.webp"),
+    webp640: withBasePath("/images/hero-villa-640.webp"),
+    width: 1024,
+    height: 685,
+  },
+  "about-home-daytime": {
+    src: withBasePath("/images/about-home-daytime.jpg"),
+    webp: withBasePath("/images/about-home-daytime.webp"),
+    webp640: withBasePath("/images/about-home-daytime-640.webp"),
+    width: 1024,
+    height: 682,
+  },
+  "about-home-evening": {
+    src: withBasePath("/images/about-home-evening.jpg"),
+    webp: withBasePath("/images/about-home-evening.webp"),
+    webp640: withBasePath("/images/about-home-evening-640.webp"),
+    width: 682,
+    height: 1024,
+  },
+  "service-home-construction": {
+    src: withBasePath("/images/service-home-construction.jpg"),
+    webp: withBasePath("/images/service-home-construction.webp"),
+    webp640: withBasePath("/images/service-home-construction-640.webp"),
+    width: 819,
+    height: 1024,
+  },
+  "service-renovation": {
+    src: withBasePath("/images/service-renovation.jpg"),
+    webp: withBasePath("/images/service-renovation.webp"),
+    webp640: withBasePath("/images/service-renovation-640.webp"),
+    width: 1024,
+    height: 680,
+  },
+  "service-commercial": {
+    src: withBasePath("/images/service-commercial.jpg"),
+    webp: withBasePath("/images/service-commercial.webp"),
+    webp640: withBasePath("/images/service-commercial-640.webp"),
+    width: 1024,
+    height: 683,
+  },
+  "service-consultation": {
+    src: withBasePath("/images/service-consultation.jpg"),
+    webp: withBasePath("/images/service-consultation.webp"),
+    webp640: withBasePath("/images/service-consultation-640.webp"),
+    width: 1024,
+    height: 685,
+  },
+};
+
 export const PHOTO_SOURCES: Record<PhotoVariant, string> = {
-  "hero-villa": withBasePath("/images/hero-villa.jpg"),
-  "about-home-daytime": withBasePath("/images/about-home-daytime.jpg"),
-  "about-home-evening": withBasePath("/images/about-home-evening.jpg"),
-  "service-home-construction": withBasePath("/images/service-home-construction.jpg"),
-  "service-renovation": withBasePath("/images/service-renovation.jpg"),
-  "service-commercial": withBasePath("/images/service-commercial.jpg"),
-  "service-consultation": withBasePath("/images/service-consultation.jpg"),
+  "hero-villa": PHOTO_META["hero-villa"].src,
+  "about-home-daytime": PHOTO_META["about-home-daytime"].src,
+  "about-home-evening": PHOTO_META["about-home-evening"].src,
+  "service-home-construction": PHOTO_META["service-home-construction"].src,
+  "service-renovation": PHOTO_META["service-renovation"].src,
+  "service-commercial": PHOTO_META["service-commercial"].src,
+  "service-consultation": PHOTO_META["service-consultation"].src,
 };
 
 export const ABOUT_SLIDES: { variant: PhotoVariant; alt: string; caption: string }[] = [

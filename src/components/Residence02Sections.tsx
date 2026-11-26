@@ -11,19 +11,20 @@ export function Residence02Sections() {
   const { openContact } = useContact();
 
   const [res2Progress, setRes2Progress] = useState(0);
-  const [res2Width, setRes2Width] = useState<number | null>(null);
   const [isLg, setIsLg] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let stableVh = window.innerHeight || 900;
+    let maxScroll = 1;
     let rafId = 0;
     let lastP = -1;
 
     const updateLayout = () => {
-      stableVh = window.innerHeight || 900;
+      const vh = window.innerHeight || 900;
       setIsLg(window.innerWidth >= 1024);
-      if (res2Ref.current) setRes2Width(res2Ref.current.clientWidth);
+      if (res2Ref.current) {
+        maxScroll = Math.max(1, res2Ref.current.offsetHeight - vh);
+      }
     };
 
     const measureScroll = () => {
@@ -37,8 +38,7 @@ export function Residence02Sections() {
       }
       if (!res2Ref.current) return;
       const rect = res2Ref.current.getBoundingClientRect();
-      const max = Math.max(1, res2Ref.current.offsetHeight - stableVh);
-      const nextP = Math.min(1, Math.max(0, -rect.top / max));
+      const nextP = Math.min(1, Math.max(0, -rect.top / maxScroll));
       if (Math.abs(nextP - lastP) > 0.0015 || nextP === 0 || nextP === 1) {
         lastP = nextP;
         setRes2Progress(nextP);
@@ -101,10 +101,7 @@ export function Residence02Sections() {
         className="relative z-30 h-[2500px] w-full bg-[#EDE6D6] text-[#2A2725] lg:h-[4600px]"
       >
         <div className="relative h-full w-full">
-          <div
-            className="ap-stage sticky top-0 h-[100dvh] w-full overflow-hidden bg-white text-[#2A2725] lg:h-screen"
-            style={{ maxWidth: res2Width ? `${res2Width}px` : "100%" }}
-          >
+          <div className="ap-stage sticky top-0 h-[100dvh] w-full overflow-hidden bg-white text-[#2A2725] lg:h-screen">
             <div className="relative h-full w-full">
               {/* GPU-composited media frame: scales smoothly on entry, glides smoothly into split framing */}
               <div
@@ -139,7 +136,8 @@ export function Residence02Sections() {
                         variant={svc.variant}
                         alt={svc.alt}
                         className="ap-img-inner h-full w-full object-cover"
-                        lazy={idx !== 0}
+                        sizes="(max-width: 1023px) 100vw, 66vw"
+                        lazy
                       />
                     </div>
                   );
@@ -236,7 +234,7 @@ export function Residence02Sections() {
       </section>
 
       {/* Complete 3-Service Engineering Breakdown & Checklists */}
-      <section className="relative z-30 bg-white px-5 py-16 text-[#2A2725] sm:px-6 md:px-10 md:py-24">
+      <section className="deferred-section relative z-30 bg-white px-5 py-16 text-[#2A2725] sm:px-6 md:px-10 md:py-24">
         <div className="mx-auto max-w-[1280px]">
           <div className="max-w-2xl">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#155341]">
@@ -260,6 +258,7 @@ export function Residence02Sections() {
                       variant={svc.variant}
                       alt={svc.alt}
                       className="h-full w-full object-cover"
+                      sizes="(max-width: 1023px) 100vw, 33vw"
                       lazy
                     />
                   </div>

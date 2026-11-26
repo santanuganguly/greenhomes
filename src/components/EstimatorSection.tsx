@@ -51,7 +51,7 @@ export function EstimatorSection() {
   return (
     <section
       id="estimator"
-      className="relative z-30 bg-[#EDE6D6] px-5 py-16 text-[#2A2725] sm:px-6 md:px-10 md:py-28"
+      className="deferred-section relative z-30 bg-[#EDE6D6] px-5 py-16 text-[#2A2725] sm:px-6 md:px-10 md:py-28"
     >
       <div className="mx-auto max-w-4xl">
         <div className="text-center">

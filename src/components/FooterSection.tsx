@@ -18,16 +18,23 @@ export function FooterSection() {
   return (
     <footer
       id="contact"
-      className="relative z-30 flex w-full flex-col bg-[#EDE6D6] px-4 pb-[calc(5.25rem+env(safe-area-inset-bottom))] pt-8 text-[#2A2725] md:px-10 md:py-12"
+      className="deferred-section relative z-30 flex w-full flex-col bg-[#EDE6D6] px-4 pb-[calc(5.25rem+env(safe-area-inset-bottom))] pt-8 text-[#2A2725] md:px-10 md:py-12"
     >
       <div className="footer-frame flex flex-1 flex-col justify-between rounded-[20px] border border-[#0f3a2e]/20 px-5 py-6 md:rounded-[30px] md:px-10 md:py-10">
         <div className="flex flex-wrap items-center justify-between gap-6 text-xs uppercase tracking-[0.12em] md:text-sm">
           <Link href="/" className="inline-block">
-            <img
-              src={withBasePath("/images/green-homes-logo.png")}
-              alt="Green Homes by Green Hill Group"
-              className="h-11 w-auto object-contain md:h-12"
-            />
+            <picture>
+              <source type="image/webp" srcSet={withBasePath("/images/green-homes-logo.webp")} />
+              <img
+                src={withBasePath("/images/green-homes-logo.png")}
+                alt="Green Homes by Green Hill Group"
+                width={448}
+                height={160}
+                loading="lazy"
+                decoding="async"
+                className="h-11 w-auto object-contain md:h-12"
+              />
+            </picture>
           </Link>
           <div className="text-right">
             <span className="block text-[11px] font-semibold tracking-[0.14em] text-[#155341]">

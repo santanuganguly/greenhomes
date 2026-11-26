@@ -6,21 +6,22 @@ import { ArchitecturalArt } from "./ArchitecturalArt";
 export function ResidenceSlidesSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [progress, setProgress] = useState(0);
-  const [stageWidth, setStageWidth] = useState<number | null>(null);
   const [isLg, setIsLg] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReducedMotion(mq.matches);
-    let stableVh = window.innerHeight || 900;
+    let maxScroll = 1;
     let rafId = 0;
     let lastP = -1;
 
     const updateLayout = () => {
-      stableVh = window.innerHeight || 900;
+      const vh = window.innerHeight || 900;
       setIsLg(window.innerWidth >= 1024);
-      if (sectionRef.current) setStageWidth(sectionRef.current.clientWidth);
+      if (sectionRef.current) {
+        maxScroll = Math.max(1, sectionRef.current.offsetHeight - vh);
+      }
     };
 
     const measureScroll = () => {
@@ -35,7 +36,6 @@ export function ResidenceSlidesSection() {
         return;
       }
       const rect = el.getBoundingClientRect();
-      const maxScroll = Math.max(1, el.offsetHeight - stableVh);
       const p = Math.min(1, Math.max(0, -rect.top / maxScroll));
       if (Math.abs(p - lastP) > 0.0015 || p === 0 || p === 1) {
         lastP = p;
@@ -72,10 +72,7 @@ export function ResidenceSlidesSection() {
       className="relative z-20 h-[2100px] w-full bg-[#EDE6D6] text-[#2A2725] lg:h-[2880px]"
     >
       <div className="relative h-full w-full">
-        <div
-          className="rs-stage sticky top-0 h-[100dvh] w-full overflow-hidden p-3 pt-20 md:p-5 md:pt-22 lg:h-screen lg:p-8"
-          style={{ maxWidth: stageWidth ? `${stageWidth}px` : "100%" }}
-        >
+        <div className="rs-stage sticky top-0 h-[100dvh] w-full overflow-hidden p-3 pt-20 md:p-5 md:pt-22 lg:h-screen lg:p-8">
           <div className="relative h-full w-full">
             <div className="absolute inset-0">
               {/* Slide 1 */}
@@ -181,6 +178,7 @@ export function ResidenceSlidesSection() {
                   variant="about-home-daytime"
                   alt="Modern residential courtyard and exterior built in North Bengal"
                   className="h-full w-full object-cover"
+                  sizes="(max-width: 1023px) 100vw, 50vw"
                   lazy
                 />
               </div>
@@ -194,6 +192,7 @@ export function ResidenceSlidesSection() {
                   variant="about-home-evening"
                   alt="Turnkey custom villa architecture in Siliguri lit at evening"
                   className="h-full w-full object-cover"
+                  sizes="(max-width: 1023px) 100vw, 50vw"
                   lazy
                 />
               </div>
