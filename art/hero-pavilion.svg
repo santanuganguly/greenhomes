@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 960" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="skyHero" x1="0" y1="0" x2="0.15" y2="1">
+      <stop offset="0%" stop-color="#697d91"/>
+      <stop offset="42%" stop-color="#98a4ae"/>
+      <stop offset="72%" stop-color="#d2c0aa"/>
+      <stop offset="100%" stop-color="#afa090"/>
+    </linearGradient>
+    <linearGradient id="concreteMain" x1="0" y1="0" x2="1" y2="0.5">
+      <stop offset="0%" stop-color="#e5dfd5"/>
+      <stop offset="60%" stop-color="#d4cdc1"/>
+      <stop offset="100%" stop-color="#b4aca0"/>
+    </linearGradient>
+    <linearGradient id="concreteShade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c756b"/>
+      <stop offset="100%" stop-color="#4e4942"/>
+    </linearGradient>
+    <linearGradient id="warmInterior" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe2ac"/>
+      <stop offset="60%" stop-color="#d89d55"/>
+      <stop offset="100%" stop-color="#7a5330"/>
+    </linearGradient>
+    <linearGradient id="courtyardStone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9e9991"/>
+      <stop offset="45%" stop-color="#858079"/>
+      <stop offset="100%" stop-color="#514e48"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="76%" cy="54%" r="50%">
+      <stop offset="0%" stop-color="#ffebc7" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#ffe7bd" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="960" fill="url(#skyHero)"/>
+  <rect width="1600" height="960" fill="url(#sunGlow)"/>
+  <ellipse cx="1220" cy="240" rx="460" ry="44" fill="#f3eadb" opacity="0.32"/>
+  <ellipse cx="520" cy="210" rx="340" ry="30" fill="#f3eadb" opacity="0.22"/>
+  <path d="M0 640 Q280 590 560 630 T1150 620 T1600 600 L1600 720 L0 720 Z" fill="#494c3e" opacity="0.78"/>
+  <polygon points="0,680 1600,665 1600,960 0,960" fill="url(#courtyardStone)"/>
+  <g stroke="#d2cdc3" stroke-opacity="0.35" stroke-width="1.5">
+    <line x1="0" y1="735" x2="1600" y2="730"/>
+    <line x1="0" y1="805" x2="1600" y2="800"/>
+    <line x1="0" y1="890" x2="1600" y2="886"/>
+    <line x1="260" y1="680" x2="40" y2="960"/>
+    <line x1="560" y1="676" x2="460" y2="960"/>
+    <line x1="880" y1="672" x2="920" y2="960"/>
+    <line x1="1200" y1="668" x2="1420" y2="960"/>
+  </g>
+  <rect x="720" y="295" width="560" height="190" fill="url(#concreteMain)"/>
+  <rect x="1280" y="308" width="280" height="368" fill="#dad3c7"/>
+  <rect x="738" y="314" width="168" height="150" fill="#2c2925"/>
+  <rect x="795" y="324" width="98" height="136" fill="url(#warmInterior)" opacity="0.92"/>
+  <line x1="844" y1="324" x2="844" y2="460" stroke="#221f1c" stroke-width="4"/>
+  <rect x="1105" y="346" width="122" height="92" fill="#322f2b"/>
+  <rect x="1138" y="352" width="58" height="80" fill="url(#warmInterior)" opacity="0.82"/>
+  <rect x="1335" y="335" width="110" height="142" fill="#2e2b27"/>
+  <rect x="1370" y="342" width="52" height="128" fill="url(#warmInterior)" opacity="0.85"/>
+  <rect x="340" y="425" width="935" height="44" fill="#edf4f9" fill-opacity="0.32" stroke="#c0cbd3" stroke-opacity="0.65" stroke-width="2"/>
+  <rect x="65" y="468" width="1240" height="24" fill="#eae4d9"/>
+  <rect x="55" y="492" width="665" height="186" fill="url(#concreteShade)"/>
+  <rect x="85" y="496" width="610" height="175" fill="url(#warmInterior)" opacity="0.9"/>
+  <rect x="75" y="492" width="22" height="186" fill="#d9d2c7"/>
+  <rect x="145" y="492" width="22" height="186" fill="#d9d2c7"/>
+  <rect x="215" y="492" width="22" height="186" fill="#d9d2c7"/>
+  <rect x="285" y="492" width="22" height="186" fill="#d9d2c7"/>
+  <rect x="355" y="492" width="22" height="186" fill="#d9d2c7"/>
+  <rect x="425" y="492" width="22" height="186" fill="#d9d2c7"/>
+  <rect x="495" y="492" width="22" height="186" fill="#d9d2c7"/>
+  <rect x="565" y="492" width="22" height="186" fill="#d9d2c7"/>
+  <rect x="635" y="492" width="22" height="186" fill="#d9d2c7"/>
+  <rect x="700" y="492" width="22" height="186" fill="#d9d2c7"/>
+  <rect x="720" y="492" width="560" height="186" fill="#5e5850"/>
+  <rect x="895" y="532" width="128" height="62" fill="#292622"/>
+  <rect x="920" y="538" width="76" height="48" fill="url(#warmInterior)" opacity="0.7"/>
+  <rect x="1068" y="532" width="112" height="58" fill="#292622"/>
+  <rect x="1335" y="520" width="110" height="125" fill="#2c2925"/>
+  <rect x="1370" y="526" width="52" height="114" fill="url(#warmInterior)" opacity="0.75"/>
+  <circle cx="255" cy="560" r="14" fill="#ffd99a" opacity="0.5"/>
+  <circle cx="255" cy="560" r="4" fill="#fff0c9"/>
+  <circle cx="711" cy="560" r="14" fill="#ffd99a" opacity="0.5"/>
+  <circle cx="711" cy="560" r="4" fill="#fff0c9"/>
+  <circle cx="1310" cy="560" r="14" fill="#ffd99a" opacity="0.5"/>
+  <circle cx="1310" cy="560" r="4" fill="#fff0c9"/>
+  <g fill="#23281b" opacity="0.75">
+    <path d="M-20 -10 Q180 90 360 160 T620 40 L640 -20 L-20 -20 Z" opacity="0.4"/>
+    <circle cx="140" cy="60" r="75" opacity="0.55"/>
+    <circle cx="250" cy="95" r="52" opacity="0.5"/>
+    <circle cx="80" cy="145" r="64" opacity="0.55"/>
+  </g>
+  <rect x="40" y="662" width="680" height="22" fill="#bab3a6"/>
+  <path d="M0 890 Q420 845 860 885 T1600 870 L1600 960 L0 960 Z" fill="#2f3524"/>
+</svg>

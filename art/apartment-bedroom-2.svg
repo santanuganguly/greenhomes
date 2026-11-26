@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice">
+  <rect width="1200" height="630" fill="#dfd7ca"/>
+  <polygon points="0,0 240,140 240,630 0,790" fill="#2a2725" opacity="0.1"/>
+  <polygon points="1200,0 960,140 960,630 1200,790" fill="#2a2725" opacity="0.06"/>
+  <polygon points="0,790 240,630 960,630 1200,790 1200,900 0,900" fill="#9d7b5a"/>
+  <rect x="640" y="140" width="280" height="440" fill="#e8eee4"/>
+  <line x1="780" y1="140" x2="780" y2="580" stroke="#2a2725" stroke-width="6" opacity="0.5"/>
+  <polygon points="640,580 920,580 760,880 300,880" fill="#f9f3e4" opacity="0.34"/>
+  <rect x="290" y="510" width="420" height="120" rx="14" fill="#6d745f"/>
+  <rect x="315" y="455" width="370" height="72" rx="12" fill="#6d745f" opacity="0.88"/>
+  <rect x="370" y="665" width="240" height="22" rx="4" fill="#3a332d"/>
+  <rect x="405" y="687" width="14" height="48" fill="#2a2725"/>
+  <rect x="565" y="687" width="14" height="48" fill="#2a2725"/>
+  <rect x="970" y="555" width="54" height="68" rx="6" fill="#595047"/>
+  <ellipse cx="997" cy="485" rx="48" ry="80" fill="#4f5f42"/>
+  <rect width="1200" height="900" fill="#000" opacity="0.06"/>
+</svg>
