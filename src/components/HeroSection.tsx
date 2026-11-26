@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ArchitecturalArt } from "./ArchitecturalArt";
 import { CharReveal } from "./CharReveal";
 import { HoverRevealText } from "./HoverRevealText";
 import { useContact } from "./ContactContext";
 
 export function HeroSection() {
+  const sectionRef = useRef<HTMLElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const { openContact } = useContact();
@@ -17,6 +18,7 @@ export function HeroSection() {
     let stableVh = window.innerHeight || 900;
     let rafId = 0;
     let lastP = -1;
+    let scrollListening = false;
 
     const measureScroll = () => {
       rafId = 0;
@@ -38,11 +40,39 @@ export function HeroSection() {
     };
 
     measureScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
+
+    const section = sectionRef.current;
+    const observer =
+      section && typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(
+            (entries) => {
+              const intersecting = Boolean(entries[0]?.isIntersecting);
+              if (intersecting) {
+                measureScroll();
+                if (!scrollListening) {
+                  window.addEventListener("scroll", onScroll, { passive: true });
+                  scrollListening = true;
+                }
+              } else if (scrollListening) {
+                window.removeEventListener("scroll", onScroll);
+                scrollListening = false;
+              }
+            },
+            { rootMargin: "200px" }
+          )
+        : null;
+    if (observer && section) {
+      observer.observe(section);
+    } else {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      scrollListening = true;
+    }
+
     return () => {
+      if (observer) observer.disconnect();
       if (rafId) window.cancelAnimationFrame(rafId);
-      window.removeEventListener("scroll", onScroll);
+      if (scrollListening) window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
   }, []);
@@ -52,7 +82,10 @@ export function HeroSection() {
   const contentTranslateY = reducedMotion ? 0 : -scrollProgress * 80;
 
   return (
-    <section className="sticky top-0 z-0 min-h-[100dvh] w-full overflow-hidden bg-black text-white lg:h-screen lg:min-h-screen select-none">
+    <section
+      ref={sectionRef}
+      className="sticky top-0 z-0 min-h-[100dvh] w-full overflow-hidden bg-black text-white lg:h-screen lg:min-h-screen select-none"
+    >
       <div
         className="hero-image-wrap pointer-events-none absolute inset-0 will-change-transform"
         style={{ transform: `scale(${scale}) translateZ(0)` }}

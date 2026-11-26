@@ -41,6 +41,7 @@ export function VillaBlueprintExplorer() {
     let maxScroll = 1;
     let rafId = 0;
     let lastP = -1;
+    let scrollListening = false;
 
     const updateLayout = () => {
       const vh = window.innerHeight || 900;
@@ -73,7 +74,6 @@ export function VillaBlueprintExplorer() {
 
     updateLayout();
     measureScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
 
     const section = sectionRef.current;
@@ -83,17 +83,32 @@ export function VillaBlueprintExplorer() {
             (entries) => {
               const intersecting = Boolean(entries[0]?.isIntersecting);
               setIsVisible(intersecting);
-              if (intersecting) setLoad3D(true);
+              if (intersecting) {
+                setLoad3D(true);
+                measureScroll();
+                if (!scrollListening) {
+                  window.addEventListener("scroll", onScroll, { passive: true });
+                  scrollListening = true;
+                }
+              } else if (scrollListening) {
+                window.removeEventListener("scroll", onScroll);
+                scrollListening = false;
+              }
             },
             { rootMargin: "450px" }
           )
         : null;
-    if (observer && section) observer.observe(section);
+    if (observer && section) {
+      observer.observe(section);
+    } else {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      scrollListening = true;
+    }
 
     return () => {
       if (observer) observer.disconnect();
       if (rafId) window.cancelAnimationFrame(rafId);
-      window.removeEventListener("scroll", onScroll);
+      if (scrollListening) window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
   }, []);
@@ -113,6 +128,9 @@ export function VillaBlueprintExplorer() {
   const explorerOpacity = Math.min(1, Math.max(0, (scrollProgress - 0.12) * 18));
   const startW = isLg ? 34 : 68;
   const startH = isLg ? 32 : 28;
+  const insetX = ((100 - startW) / 2) * (1 - expandT);
+  const insetY = ((100 - startH) / 2) * (1 - expandT);
+  const clipRadius = Math.round((1 - expandT) * 12);
   const progressRatio = activeLayerIndex / (BLUEPRINT_LAYERS.length - 1);
 
   return (
@@ -158,13 +176,14 @@ export function VillaBlueprintExplorer() {
             </button>
           </div>
 
-          {/* Expanding real-house-to-3D-model viewport */}
+          {/* Expanding real-house-to-3D-model viewport (clip-path keeps WebGL canvas size constant for 60fps scroll) */}
           <div
-            className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
+            className="absolute inset-0 z-20 overflow-hidden"
             style={{
-              width: `${startW + expandT * (100 - startW)}%`,
-              height: `${startH + expandT * (100 - startH)}%`,
-              borderRadius: `${Math.round((1 - expandT) * 12)}px`,
+              clipPath:
+                expandT >= 0.999
+                  ? "none"
+                  : `inset(${insetY.toFixed(2)}% ${insetX.toFixed(2)}% round ${clipRadius}px)`,
               background:
                 "linear-gradient(180deg, #0b2d23 0%, #154d3c 44%, #0f3a2e 76%, #081e17 100%)",
             }}

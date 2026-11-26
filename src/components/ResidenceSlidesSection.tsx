@@ -15,6 +15,7 @@ export function ResidenceSlidesSection() {
     let maxScroll = 1;
     let rafId = 0;
     let lastP = -1;
+    let scrollListening = false;
 
     const updateLayout = () => {
       const vh = window.innerHeight || 900;
@@ -54,11 +55,39 @@ export function ResidenceSlidesSection() {
 
     updateLayout();
     measureScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
+
+    const section = sectionRef.current;
+    const observer =
+      section && typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(
+            (entries) => {
+              const intersecting = Boolean(entries[0]?.isIntersecting);
+              if (intersecting) {
+                measureScroll();
+                if (!scrollListening) {
+                  window.addEventListener("scroll", onScroll, { passive: true });
+                  scrollListening = true;
+                }
+              } else if (scrollListening) {
+                window.removeEventListener("scroll", onScroll);
+                scrollListening = false;
+              }
+            },
+            { rootMargin: "250px" }
+          )
+        : null;
+    if (observer && section) {
+      observer.observe(section);
+    } else {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      scrollListening = true;
+    }
+
     return () => {
+      if (observer) observer.disconnect();
       if (rafId) window.cancelAnimationFrame(rafId);
-      window.removeEventListener("scroll", onScroll);
+      if (scrollListening) window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
   }, []);

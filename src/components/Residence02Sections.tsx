@@ -18,6 +18,7 @@ export function Residence02Sections() {
     let maxScroll = 1;
     let rafId = 0;
     let lastP = -1;
+    let scrollListening = false;
 
     const updateLayout = () => {
       const vh = window.innerHeight || 900;
@@ -56,11 +57,39 @@ export function Residence02Sections() {
 
     updateLayout();
     measureScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
+
+    const section = res2Ref.current;
+    const observer =
+      section && typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(
+            (entries) => {
+              const intersecting = Boolean(entries[0]?.isIntersecting);
+              if (intersecting) {
+                measureScroll();
+                if (!scrollListening) {
+                  window.addEventListener("scroll", onScroll, { passive: true });
+                  scrollListening = true;
+                }
+              } else if (scrollListening) {
+                window.removeEventListener("scroll", onScroll);
+                scrollListening = false;
+              }
+            },
+            { rootMargin: "250px" }
+          )
+        : null;
+    if (observer && section) {
+      observer.observe(section);
+    } else {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      scrollListening = true;
+    }
+
     return () => {
+      if (observer) observer.disconnect();
       if (rafId) window.cancelAnimationFrame(rafId);
-      window.removeEventListener("scroll", onScroll);
+      if (scrollListening) window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
   }, []);
@@ -107,7 +136,7 @@ export function Residence02Sections() {
               <div
                 className={`ap-img-frame absolute left-0 top-0 h-full overflow-hidden will-change-transform ${
                   showSplit
-                    ? "transition-[transform,width,border-radius] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                    ? "transition-[transform,border-radius] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:transition-[transform,width,border-radius]"
                     : ""
                 }`}
                 style={{

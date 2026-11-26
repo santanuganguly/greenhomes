@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 interface HoverRevealTextProps {
   text: string;
@@ -8,6 +8,27 @@ interface HoverRevealTextProps {
 }
 
 export function HoverRevealText({ text, className = "" }: HoverRevealTextProps) {
+  const [enhanced, setEnhanced] = useState(false);
+
+  function activateHover() {
+    if (enhanced) return;
+    if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+      setEnhanced(true);
+    }
+  }
+
+  if (!enhanced) {
+    return (
+      <span
+        data-hover-reveal="true"
+        onMouseEnter={activateHover}
+        className={`inline-block ${className}`}
+      >
+        {text}
+      </span>
+    );
+  }
+
   const chars = Array.from(text);
 
   return (
