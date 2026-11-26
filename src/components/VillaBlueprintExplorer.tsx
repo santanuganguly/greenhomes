@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { BLUEPRINT_LAYERS, BRAND_NAME } from "@/data/siteContent";
+import { ArchitecturalArt } from "./ArchitecturalArt";
 
 interface LayerMeshes {
   walls: THREE.Group;
@@ -64,6 +65,7 @@ export function VillaBlueprintExplorer() {
 
   const [scrollProgress, setScrollProgress] = useState(0);
   const [stageWidth, setStageWidth] = useState<number | null>(null);
+  const [isLg, setIsLg] = useState(true);
   const [manualLayer, setManualLayer] = useState<number | null>(null);
   const [marqueePaused, setMarqueePaused] = useState(false);
   const [webglReady, setWebglReady] = useState(true);
@@ -74,7 +76,7 @@ export function VillaBlueprintExplorer() {
 
   const scrollLayerIndex = Math.min(
     BLUEPRINT_LAYERS.length - 1,
-    Math.max(0, Math.floor(((scrollProgress - 0.12) / 0.88) * BLUEPRINT_LAYERS.length))
+    Math.max(0, Math.floor(((scrollProgress - 0.14) / 0.86) * BLUEPRINT_LAYERS.length))
   );
   const activeLayerIndex = manualLayer !== null ? manualLayer : scrollLayerIndex;
   const activeLayer = BLUEPRINT_LAYERS[activeLayerIndex];
@@ -89,6 +91,7 @@ export function VillaBlueprintExplorer() {
 
     const updateLayout = () => {
       stableVh = window.innerHeight || 900;
+      setIsLg(window.innerWidth >= 1024);
       if (sectionRef.current) setStageWidth(sectionRef.current.clientWidth);
     };
 
@@ -383,9 +386,15 @@ export function VillaBlueprintExplorer() {
     manualTimeoutRef.current = window.setTimeout(() => setManualLayer(null), 6000);
   }
 
-  const marqueeFade = Math.max(0, 1 - scrollProgress * 11);
-  const expandT = Math.min(1, Math.max(0, scrollProgress / 0.085));
-  const explorerOpacity = Math.min(1, Math.max(0, (scrollProgress - 0.09) * 14));
+  const marqueeFade = Math.max(0, 1 - scrollProgress * 10);
+  const expandT = Math.min(1, Math.max(0, scrollProgress / 0.13));
+  const rawDissolve = Math.min(1, Math.max(0, (scrollProgress - 0.025) / 0.105));
+  const smoothDissolve = rawDissolve * rawDissolve * (3 - 2 * rawDissolve);
+  const photoOpacity = Math.max(0, 1 - smoothDissolve);
+  const modelOpacity = smoothDissolve;
+  const explorerOpacity = Math.min(1, Math.max(0, (scrollProgress - 0.12) * 18));
+  const startW = isLg ? 34 : 68;
+  const startH = isLg ? 32 : 28;
   const progressRatio = activeLayerIndex / (BLUEPRINT_LAYERS.length - 1);
 
   return (
@@ -434,25 +443,46 @@ export function VillaBlueprintExplorer() {
             </button>
           </div>
 
-          {/* Expanding 3D viewport */}
+          {/* Expanding real-house-to-3D-model viewport matching reference transition */}
           <div
-            className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
+            className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 overflow-hidden will-change-[width,height,border-radius]"
             style={{
-              width: `${34 + expandT * 66}%`,
-              height: `${32 + expandT * 68}%`,
-              minWidth: expandT > 0.8 ? "100%" : "260px",
-              minHeight: expandT > 0.8 ? "100%" : "200px",
-              borderRadius: `${Math.round((1 - expandT) * 10)}px`,
+              width: `${startW + expandT * (100 - startW)}%`,
+              height: `${startH + expandT * (100 - startH)}%`,
+              borderRadius: `${Math.round((1 - expandT) * 12)}px`,
               background:
                 "linear-gradient(180deg, #0b2d23 0%, #154d3c 44%, #0f3a2e 76%, #081e17 100%)",
             }}
           >
+            {/* Interactive 3D wireframe canvas fading in smoothly as container expands */}
             <div
-              ref={canvasHostRef}
-              role="img"
-              aria-label="Interactive 3D turnkey structural engineering model. Swipe horizontally to rotate."
-              className="h-full w-full cursor-grab active:cursor-grabbing"
-            />
+              className="absolute inset-0 h-full w-full will-change-opacity"
+              style={{ opacity: modelOpacity }}
+            >
+              <div
+                ref={canvasHostRef}
+                role="img"
+                aria-label="Interactive 3D turnkey structural engineering model. Swipe horizontally to rotate."
+                className="h-full w-full cursor-grab active:cursor-grabbing"
+              />
+            </div>
+
+            {/* Real completed house photo visible at marquee start, dissolving into 3D model on scroll */}
+            {photoOpacity > 0.005 && (
+              <div
+                className="pointer-events-none absolute inset-0 z-[5] overflow-hidden will-change-[opacity,transform]"
+                style={{
+                  opacity: photoOpacity,
+                  transform: `scale(${1 + smoothDissolve * 0.05}) translateZ(0)`,
+                }}
+              >
+                <ArchitecturalArt
+                  variant="about-home-daytime"
+                  alt="Completed Green Homes modern residence exterior transitioning into 3D structural blueprint"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            )}
 
             {!webglReady && (
               <div className="absolute inset-0 flex items-center justify-center bg-[#0f3a2e] px-6 text-center text-white">
@@ -463,7 +493,7 @@ export function VillaBlueprintExplorer() {
             )}
 
             <div
-              className="pointer-events-none absolute inset-0"
+              className="pointer-events-none absolute inset-0 z-10"
               style={{
                 opacity: expandT >= 0.96 ? explorerOpacity : 0,
                 display: expandT >= 0.96 && explorerOpacity > 0.01 ? "block" : "none",
